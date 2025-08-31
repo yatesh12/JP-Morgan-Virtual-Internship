@@ -53,10 +53,15 @@ const MetricsGrid = ({ data }: MetricsGridProps) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      {metrics.map((metric) => {
+      {metrics.map((metric, index) => {
         const Icon = metric.icon;
         return (
-          <Card key={metric.title} data-testid={metric.testId}>
+          <Card 
+            key={metric.title} 
+            data-testid={metric.testId}
+            className="hover:shadow-lg transition-all duration-300 animate-bounce-in border border-border/50"
+            style={{ animationDelay: `${index * 100}ms` }}
+          >
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>

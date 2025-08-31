@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
+import type { StockData } from "@shared/schema";
 
 interface TopMoversProps {
   components?: Array<{ symbol: string; name: string }>;
@@ -8,14 +10,22 @@ interface TopMoversProps {
 }
 
 const TopMovers = ({ components, isLoading }: TopMoversProps) => {
-  // Mock data for top movers with realistic movements
-  const topMovers = [
-    { symbol: "AAPL", name: "Apple Inc.", price: 175.84, changePercent: 2.34, isPositive: true },
-    { symbol: "MSFT", name: "Microsoft Corp.", price: 378.91, changePercent: 1.89, isPositive: true },
-    { symbol: "BA", name: "Boeing Co.", price: 203.45, changePercent: -1.23, isPositive: false },
-  ];
+  // Fetch all stock data to find top movers
+  const { data: allStocks, isLoading: stocksLoading } = useQuery<StockData[]>({
+    queryKey: ["/api/stocks"],
+    refetchInterval: 30000,
+  });
 
-  if (isLoading) {
+  // Get top 3 movers by absolute change percentage
+  const topMovers = allStocks 
+    ? allStocks
+        .sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent))
+        .slice(0, 3)
+    : [];
+
+  const isLoadingData = isLoading || stocksLoading;
+
+  if (isLoadingData) {
     return (
       <Card>
         <CardHeader>
@@ -49,11 +59,12 @@ const TopMovers = ({ components, isLoading }: TopMoversProps) => {
       <CardContent>
         <div className="space-y-3">
           {topMovers.map((stock) => {
-            const Icon = stock.isPositive ? TrendingUp : TrendingDown;
+            const isPositive = stock.changePercent >= 0;
+            const Icon = isPositive ? TrendingUp : TrendingDown;
             return (
               <div 
                 key={stock.symbol} 
-                className="flex items-center justify-between"
+                className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-all duration-200 group"
                 data-testid={`top-mover-${stock.symbol}`}
               >
                 <div className="flex items-center space-x-3">
@@ -69,10 +80,10 @@ const TopMovers = ({ components, isLoading }: TopMoversProps) => {
                 </div>
                 <div className="text-right">
                   <div className={`flex items-center text-sm ${
-                    stock.isPositive ? 'text-success' : 'text-destructive'
+                    isPositive ? 'text-success' : 'text-destructive'
                   }`}>
                     <Icon className="h-3 w-3 mr-1" />
-                    <span>{stock.isPositive ? '+' : ''}{stock.changePercent.toFixed(2)}%</span>
+                    <span>{isPositive ? '+' : ''}{stock.changePercent.toFixed(2)}%</span>
                   </div>
                 </div>
               </div>

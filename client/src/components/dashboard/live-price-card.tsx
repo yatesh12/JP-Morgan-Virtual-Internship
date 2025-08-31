@@ -36,7 +36,7 @@ const LivePriceCard = ({ data, isLoading }: LivePriceCardProps) => {
   const Icon = isPositive ? TrendingUp : TrendingDown;
 
   return (
-    <Card data-testid="live-price-card">
+    <Card data-testid="live-price-card" className="border border-border/50 shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse-glow">
       <CardContent className="p-6">
         <div className="space-y-4">
           <div className="flex items-center justify-between">

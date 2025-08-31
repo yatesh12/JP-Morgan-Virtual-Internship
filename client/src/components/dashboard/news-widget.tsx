@@ -29,9 +29,10 @@ const NewsWidget = ({ news, isLoading }: NewsWidgetProps) => {
 
   const displayNews = news && news.length > 0 ? news : fallbackNews;
 
-  const formatTimeAgo = (date: Date) => {
+  const formatTimeAgo = (date: Date | string) => {
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    const publishDate = typeof date === 'string' ? new Date(date) : date;
+    const diffInMinutes = Math.floor((now.getTime() - publishDate.getTime()) / (1000 * 60));
     
     if (diffInMinutes < 60) {
       return `${diffInMinutes} minutes ago`;
@@ -74,7 +75,7 @@ const NewsWidget = ({ news, isLoading }: NewsWidgetProps) => {
           {displayNews.slice(0, 3).map((item, index) => (
             <div 
               key={item.id || index} 
-              className="border-b border-border pb-3 last:border-b-0"
+              className="border-b border-border pb-3 last:border-b-0 hover:bg-muted/30 transition-colors p-2 rounded cursor-pointer"
               data-testid={`news-item-${index}`}
             >
               <h4 className="text-sm font-medium leading-tight mb-1">
